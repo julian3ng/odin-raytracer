@@ -1,6 +1,5 @@
 package raytracer
 
-import "core:math"
 import "core:fmt"
 import "core:os"
 
@@ -8,12 +7,17 @@ W := 600
 H := 500
 
 color :: proc(r: Ray) -> [3]f64 {
-  if hit_sphere([3]f64{0.0, 0.0, -2.1}, 2.0, r) {
-    return [3]f64{1.0, 0.0, 0.0}
+  if hr, hr_ok := hit(Sphere{
+    center=[3]f64{0.0, 0.0, -2.0},
+    radius=1.0
+  }, r, 0.0, 1.5).?; hr_ok {
+    normal := hr.normal
+    return 0.5 * Vec3{normal.x + 1, normal.y + 1, normal.z + 1}
+  } else {
+    unit_direction := normalized(direction(r))
+    t := 0.5 * (unit_direction.y + 1.0)
+    return (1.0 - t) * [3]f64{1.0, 1.0, 1.0} + t * [3]f64{0.3, 0.3, 0.7}
   }
-  unit_direction := normalized(direction(r))
-  t := 0.5 * (unit_direction.y + 1.0)
-  return (1.0 - t) * [3]f64{1.0, 1.0, 1.0} + t * [3]f64{0.3, 0.3, 0.7}
 }
 
 main :: proc() {
