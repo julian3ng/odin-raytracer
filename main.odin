@@ -24,10 +24,13 @@ main :: proc() {
   fmt.fprintfln(img, "%d %d", W, H)
   fmt.fprintln(img, "255")
 
-  lower_left := Vec3 { -1.0 * f64(W) / 100.0, -1.0 * f64(H) / 100.0, -1.0 }
-  horizontal := Vec3 { 2.0 * f64(W) / 100.0 , 0.0, 0.0 }
-  vertical := Vec3 { 0.0, 2.0 * f64(H) / 100.0, 0.0 }
-  origin := Vec3 { 0.0, 0.0, 0.0 }
+
+  camera := Camera {
+    lower_left = Vec3 { -1.0 * f64(W) / 100.0, -1.0 * f64(H) / 100.0, -1.0 },
+    horizontal = Vec3 { 2.0 * f64(W) / 100.0 , 0.0, 0.0 },
+    vertical = Vec3 { 0.0, 2.0 * f64(H) / 100.0, 0.0 },
+    origin = Vec3 { 0.0, 0.0, 0.0 },
+  }
 
   world := []Hittable{
     Sphere{
@@ -44,12 +47,7 @@ main :: proc() {
     for j:=0; j<W; j+=1 {
       u := f64(j) / f64(W)
       v := f64(i) / f64(H)
-
-      r := Ray {
-        origin,
-        lower_left + u*horizontal + v*vertical
-      }
-
+      r := get_ray(camera, u, v)
       c := color(r, world) * 255.99
       fmt.fprintfln(img, "%d %d %d", u8(c.r), u8(c.g), u8(c.b))
     }
