@@ -7,7 +7,7 @@ Sphere :: struct {
   radius: f64
 }
 
-hit :: proc(s: Sphere, r: Ray, t_min: f64, t_max: f64) -> Maybe(HitRecord) {
+hit_sphere :: proc(s: Sphere, r: Ray, t_min: f64, t_max: f64) -> Maybe(HitRecord) {
   center, radius := s.center, s.radius
   oc := origin(r) - center
   a := dot(direction(r), direction(r))
