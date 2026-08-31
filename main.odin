@@ -1,15 +1,22 @@
 package raytracer
 
+import "core:math"
 import "core:fmt"
 import "core:os"
 
-W := 200
-H := 100
+W := 600
+H := 400
+
+/*
+* Given a ray and the world, collide the ray against all the world objects.
+*/
 
 color :: proc(r: Ray, world: []Hittable) -> [3]f64 {
-  if hr, hr_ok := hit_list(world, r, 0.0, 3).?; hr_ok {
-    normal := hr.normal
-    return 0.5 * Vec3{normal.x + 1, normal.y + 1, normal.z + 1}
+  if hr, hr_ok := hit_list(world, r, 0.000001, 10000).?; hr_ok {
+    // the material shoots a ray in a random direction away from the contact
+    // point and we get the color of *that* ray.
+    target := hr.p + hr.normal + random_in_unit_sphere()
+    return 0.5 * color(Ray{hr.p, target - hr.p}, world)
   } else {
     unit_direction := normalized(direction(r))
     t := 0.5 * (unit_direction.y + 1.0)
@@ -26,7 +33,7 @@ main :: proc() {
 
 
   camera := Camera {
-    lower_left = Vec3 { -1.0 * f64(W) / 100.0, -1.0 * f64(H) / 100.0, -1.0 },
+    lower_left = Vec3 { -1.0 * f64(W) / 100.0, -1.0 * f64(H) / 100.0, -3.0 },
     horizontal = Vec3 { 2.0 * f64(W) / 100.0 , 0.0, 0.0 },
     vertical = Vec3 { 0.0, 2.0 * f64(H) / 100.0, 0.0 },
     origin = Vec3 { 0.0, 0.0, 0.0 },
@@ -45,11 +52,20 @@ main :: proc() {
 
   for i:=H-1; i>=0; i-=1 {
     for j:=0; j<W; j+=1 {
-      u := f64(j) / f64(W)
-      v := f64(i) / f64(H)
-      r := get_ray(camera, u, v)
-      c := color(r, world) * 255.99
-      fmt.fprintfln(img, "%d %d %d", u8(c.r), u8(c.g), u8(c.b))
+      final_color := [3]f64{ 0.0, 0.0, 0.0}
+      for s:=0;s<4; s+= 1 {
+        u := f64(j) / f64(W)
+        v := f64(i) / f64(H)
+        r := get_ray(camera, u, v)
+        final_color += color(r, world)
+      }
+      final_color /= 4.0
+      final_color.r = math.sqrt_f64(final_color.r)
+      final_color.g = math.sqrt_f64(final_color.g)
+      final_color.b = math.sqrt_f64(final_color.b)
+      final_color *= 255.59
+
+      fmt.fprintfln(img, "%d %d %d", u8(final_color.r), u8(final_color.g), u8(final_color.b))
     }
   }
 

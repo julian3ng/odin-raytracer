@@ -1,6 +1,7 @@
 package raytracer
 
 import "core:math"
+import "core:math/rand"
 
 Vec3 :: [3]f64
 
@@ -18,4 +19,13 @@ length_squared :: proc(v: Vec3) -> f64 {
 
 normalized :: proc(v: Vec3) -> Vec3 {
   return v / length(v)
+}
+
+random_in_unit_sphere :: proc() -> Vec3 {
+  v : Vec3 = ({ rand.float64(), rand.float64(), rand.float64() } * 2.0) - { 1.0, 1.0, 1.0 }
+  // rejection sampling: randomize until we hit something with a sub-1 norm.
+  for (length(v) > 1.0) {
+    v = ({ rand.float64(), rand.float64(), rand.float64() } * 2.0) - { 1.0, 1.0, 1.0 }
+  }
+  return v
 }
