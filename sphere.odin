@@ -4,7 +4,8 @@ import "core:math"
 
 Sphere :: struct {
   center: Vec3,
-  radius: f64
+  radius: f64,
+  material: Material
 }
 
 hit_sphere :: proc(s: Sphere, r: Ray, t_min: f64, t_max: f64) -> Maybe(HitRecord) {
@@ -23,7 +24,8 @@ hit_sphere :: proc(s: Sphere, r: Ray, t_min: f64, t_max: f64) -> Maybe(HitRecord
       return HitRecord{
         t=soln,
         p=p,
-        normal=((p - center) / radius)
+        normal=((p - center) / radius),
+        material=s.material
       }
     }
     soln = (-b + math.sqrt(discriminant)) / a
@@ -32,7 +34,8 @@ hit_sphere :: proc(s: Sphere, r: Ray, t_min: f64, t_max: f64) -> Maybe(HitRecord
       return HitRecord{
         t=soln,
         p=p,
-        normal=((p - center) / radius)
+        normal=((p - center) / radius),
+        material=s.material
       }
     }
     return nil
